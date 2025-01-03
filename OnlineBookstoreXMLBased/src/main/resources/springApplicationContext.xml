@@ -9,7 +9,10 @@ http://www.springframework.org/schema/context
 https://www.springframework.org/schema/context/spring-context.xsd
 http://www.springframework.org/schema/aop
 https://www.springframework.org/schema/aop/spring-aop.xsd">
-    <!-- bean definitions here -->
-    <bean id="dbConnectionManager" class="com.bookstore.DBConnectionManager"></bean>
-    
+    <bean id="dbConnectionManager" class="com.bookstore.DBConnectionManager">
+        <constructor-arg name="url" value="jdbc:mysql://localhost:3306/BookstoreDB" />
+        <constructor-arg name="username" value="root" />
+        <constructor-arg name="password" value="#Mini555" />
+    </bean>
+
 </beans>
