@@ -1,0 +1,87 @@
+<html>
+  <head>
+    <title>Online Book Store</title>
+  </head>
+  <body>
+    <h2>Online Book Store</h2>
+    <h3>Add New Book</h3>
+    <form class="flex flex-col" action="register" method="post">
+      <!-- Task Description -->
+      <div>
+        <label for="title">Book Title:</label>
+        <input
+          type="text"
+          id="title"
+          name="title"
+          placeholder="Enter book title"
+          required
+        />
+      </div>
+      <div>
+        <label for="author">Book Author:</label>
+        <input
+          type="text"
+          id="author"
+          name="author"
+          placeholder="Enter book author"
+          required
+        />
+      </div>
+
+      <div>
+        <label for="price">Book Price:</label>
+        <input
+          type="number"
+          id="price"
+          name="price"
+          placeholder="Enter book price"
+          required
+        />
+      </div>
+
+      <!-- Submit Button -->
+      <button type="submit">Register Book</button>
+    </form>
+
+    <br />
+    <a href="displayBooks">View All Books</a>
+    <br />
+    <br />
+    <h3>Delete Book</h3>
+
+    <form action="deleteBook" method="post">
+      <!-- Book ID -->
+      <label for="book_id">Book ID:</label>
+      <input
+        type="number"
+        id="book_id"
+        name="id"
+        placeholder="Enter book ID to delete"
+        required
+      />
+
+      <!-- Submit Button -->
+      <button type="submit">Delete Book</button>
+    </form>
+
+    <br />
+    <h3>Search Book By Id</h3>
+
+    <form action="searchBooks" method="get">
+      <!-- Search Description -->
+      <label for="search_book">Search Title:</label>
+      <input
+        type="text"
+        id="search_book"
+        name="title"
+        placeholder="Enter title to search"
+        required
+      />
+
+      <!-- Submit Button -->
+      <button type="submit">Search Books</button>
+    </form>
+
+    <script></script>
+  </body>
+</html>
