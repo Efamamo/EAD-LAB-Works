@@ -1,3 +1,11 @@
+# Name and ID
+
+| Name          | ID Number   |
+| ------------- | ----------- |
+| Ephrem Mamo   | UGR/1504/14 |
+| Nardos Daniel | UGR/1442/14 |
+| Beka Birhanu  | UGR/3402/14 |
+
 # VoteSphere - Group poll Manager
 
 VoteSphere is a poll management application that allows users to work together within groups, managing polls efficiently. The application provides user authentication, authorization, and group-based poll management.
@@ -28,7 +36,8 @@ To run VoteSphere locally, follow these steps:
 ### Step 1: Clone the Repository
 
 ```bash
-    git clone https://github.com/Efamamo/votesphere-spring.git
+    git clone https://github.com/Efamamo/EAD-LAB-Works.git
+    git checkout EADProject
     cd votesphere-spring
 ```
 
