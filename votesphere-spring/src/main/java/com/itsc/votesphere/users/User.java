@@ -50,7 +50,7 @@ public class User {
     private LocalDateTime otpExpirationDate;
 
     // A user can be an admin of one group
-    @OneToOne(mappedBy = "admin", fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "admin")
     private Group group;
 
     // A user can be a member of one group

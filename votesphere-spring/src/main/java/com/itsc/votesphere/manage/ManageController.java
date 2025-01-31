@@ -33,6 +33,8 @@ public class ManageController {
             response.sendRedirect("/auth/login");  
             return null;
         }
+      
+
         
 
         if (!user.getIsVerified()){
@@ -40,18 +42,14 @@ public class ManageController {
             return null;
         }
 
-        Group userGroup = user.getGroup();
-
+        Group userGroup = user.getMemberOf();
 
         model.addAttribute("name", user.getUsername());
         model.addAttribute("email", user.getEmail());
-        model.addAttribute("group", user.getGroup().getGroupName());
+       
+        model.addAttribute("group", userGroup != null ? userGroup.getGroupName(): null);
         model.addAttribute("isAdmin", user.getIsAdmin());
-        
-        model.addAttribute("polls", userGroup.getPolls() != null ? userGroup.getPolls().size() : 0);
-        
-
-
+        model.addAttribute("polls", userGroup != null ? userGroup.getPolls().size(): 0);
 
         return "profile";
     }
