@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head th:replace="fragments/logged_head :: head"></head>
+  <body class="bg-gray-50 min-h-screen">
+    <!-- Navigation -->
+    <nav th:replace="fragments/nav :: nav"></nav>
+
+    <!-- Main Content -->
+    <div class="container max-w-6xl mx-auto px-4 py-8">
+      <!-- Add Poll Button -->
+      <div class="flex justify-between items-center mb-6">
+        <h1
+          th:if="${hasGroup && polls.size > 0}"
+          class="text-3xl font-semibold text-gray-800"
+        >
+          Polls
+        </h1>
+        <h1
+          th:if="${hasGroup && polls.size == 0}"
+          class="text-3xl font-semibold text-gray-800"
+        >
+          No Polls
+        </h1>
+        <h1 th:if="${!hasGroup}" class="text-3xl font-semibold text-gray-800">
+          No Group
+        </h1>
+
+        <a
+          class="text-gray-50 hover:text-blue-500 flex gap-1 items-center flex-col max-w-content"
+          href="/polls/add"
+          th:if="${isAdmin && hasGroup}"
+          id="nav-about"
+        >
+          <img class="w-7" src="../../assets/add.png" alt="" />
+          <div class="text-sm">Add Poll</div>
+        </a>
+
+        <a
+          th:if="${isAdmin && !hasGroup}"
+          href="/groups/add"
+          class="px-4 py-2 bg-blue-500 text-white text-sm font-medium rounded-md shadow hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
+        >
+          Add Group
+        </a>
+      </div>
+
+      <!-- Polls List -->
+      <ul class="space-y-6">
+        <li
+          th:each="poll : ${polls}"
+          th:value="${poll.id}"
+          class="bg-white rounded-lg shadow p-6 pb-4 to-single cursor-pointer"
+          th:data-poll-id="${poll.id}"
+        >
+          <!-- Poll Header -->
+          <div
+            class="flex items-center gap-4 mb-4 to-single cursor-pointer"
+            th:data-poll-id="${poll.id}"
+          >
+            <span
+              th:text="${poll.id}"
+              class="text-sm font-medium text-gray-500 bg-gray-100 px-3 py-1 rounded-full"
+            ></span>
+            <h2
+              th:text="${poll.question}"
+              class="text-xl font-semibold text-gray-800"
+            ></h2>
+          </div>
+
+          <div class="space-y-2 pl-12" th:each="choice : ${poll.choices}">
+            <div class="flex justify-between items-center gap-4">
+              <p
+                class="text-lg font-semibold w-24 text-right"
+                th:text="${choice.count + ' %'}"
+              ></p>
+
+              <div
+                class="w-full border border-grey-400 my-2 flex flex-col gap-2 rounded-e rounded-e-lg"
+              >
+                <div class="flex items-center gap-2 cursor-pointer p-2">
+                  <input
+                    type="radio"
+                    th:name="${poll.id}"
+                    th:id="${choice.id}"
+                    th:value="${choice.content}"
+                    th:checked="${choice.checked == 'yes'}"
+                    class="appearance-none w-4 h-4 border-2 border-blue-500 rounded-full checked:bg-blue-500 poll-choice cursor-pointer"
+                  />
+
+                  <label
+                    th:text="${choice.content}"
+                    th:for="${choice.id}"
+                    class="font-medium cursor-pointer"
+                  ></label>
+                </div>
+                <div
+                  class="bg-blue-600 h-1 rounded-e rounded-e-lg"
+                  th:style="'width: ' + (${choice.count} == 0 ? '0.2' : ${choice.count}) + '%;'"
+                ></div>
+              </div>
+            </div>
+          </div>
+          <div
+            class="flex justify-between items-center mt-4 border-t pt-4 pl-4"
+          >
+            <a th:href="@{/polls/{id}(id=${poll.id})}">
+              <div class="flex gap-2 items-center cursor-pointer to-single">
+                <img src="assets/comment.png" alt="" class="w-6 mt-1" />
+                <div class="flex items-center gap-1">
+                  <p
+                    th:text="${poll.comments + ' comments'}"
+                    class="font-medium text-blue-600"
+                  ></p>
+                  <img src="assets/next.png" alt="" class="w-3 mt-0.5" />
+                </div></div
+            ></a>
+
+            <div class="flex items-center gap-6 mr-2">
+              <div class="flex items-center gap-2">
+                <p
+                  th:text="${poll.likes}"
+                  class="font-medium text-blue-600"
+                ></p>
+                <button th:if="${poll.userLiked}" th:attr="data-id=${poll.id}">
+                  <i
+                    th:attr="data-id=${poll.id}"
+                    class="fas fa-thumbs-up unlike_btn"
+                    style="color: blue"
+                  ></i>
+                </button>
+                <button th:if="${!poll.userLiked}">
+                  <i
+                    th:attr="data-id=${poll.id}"
+                    class="far fa-thumbs-up like_btn"
+                  ></i>
+                </button>
+              </div>
+
+              <!-- Dislike Section -->
+              <div class="flex items-center gap-2 mt-2">
+                <p
+                  th:text="${poll.dislikes}"
+                  class="font-medium text-blue-600 mb-2"
+                ></p>
+                <button th:if="${poll.userDisliked}">
+                  <i
+                    th:attr="data-id=${poll.id}"
+                    class="fas fa-thumbs-down undislike_btn"
+                    style="color: red"
+                  ></i>
+                </button>
+                <button th:if="${!poll.userDisliked}">
+                  <i
+                    th:attr="data-id=${poll.id}"
+                    class="far fa-thumbs-down dislike_btn"
+                  ></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </body>
+</html>
+
+<script>
+  // Select all elements with the class 'poll-choice'
+  const choices = document.querySelectorAll('.poll-choice');
+  const toSingle = document.querySelectorAll('.to-single');
+  const like_buttons = document.querySelectorAll('.like_btn');
+  const unlike_buttons = document.querySelectorAll('.unlike_btn');
+  const dislike_buttons = document.querySelectorAll('.dislike_btn');
+  const undislike_buttons = document.querySelectorAll('.undislike_btn');
+
+  like_buttons.forEach((button) => {
+    button.addEventListener('click', async () => {
+      try {
+        const pollId = button.getAttribute('data-id');
+        const response = await fetch(`/polls/${pollId}/like`, {
+          method: 'PATCH',
+        });
+        const data = await response.json();
+        if (response.status == 200) {
+          window.location.reload();
+        }
+      } catch (e) {
+        console.log(e);
+      }
+    });
+  });
+
+  unlike_buttons.forEach((button) => {
+    button.addEventListener('click', async () => {
+      try {
+        const pollId = button.getAttribute('data-id');
+        const response = await fetch(`/polls/${pollId}/unlike`, {
+          method: 'PATCH',
+        });
+        const data = await response.json();
+        if (response.status == 200) {
+          window.location.reload();
+        }
+      } catch (e) {
+        console.log(e);
+      }
+    });
+  });
+
+  dislike_buttons.forEach((button) => {
+    button.addEventListener('click', async () => {
+      try {
+        const pollId = button.getAttribute('data-id');
+        const response = await fetch(`/polls/${pollId}/dislike`, {
+          method: 'PATCH',
+        });
+        const data = await response.json();
+        console.log(data);
+        if (response.status == 200) {
+          window.location.reload();
+        }
+      } catch (e) {
+        console.log(e);
+      }
+    });
+  });
+
+  undislike_buttons.forEach((button) => {
+    button.addEventListener('click', async () => {
+      try {
+        const pollId = button.getAttribute('data-id');
+        const response = await fetch(`/polls/${pollId}/undislike`, {
+          method: 'PATCH',
+        });
+        const data = await response.json();
+        if (response.status == 200) {
+          window.location.reload();
+        }
+      } catch (e) {
+        console.log(e);
+      }
+    });
+  });
+
+  // Iterate over each choice and attach a click event listener
+  choices.forEach((choice) => {
+    choice.addEventListener('click', async (e) => {
+      // Log the ID of the selected choice
+      const choice = e.target.id;
+      const poll = e.target.name;
+
+      const response = await fetch(`/polls/${poll}?choice=${choice}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          choiceId: choice,
+        }),
+      });
+
+      const data = await response.json();
+      if (response.status == 200) {
+        window.location.reload();
+      }
+      console.log(data);
+    });
+  });
+
+  toSingle.forEach((s) => {
+    s.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const pollId = s.getAttribute('data-poll-id');
+      window.location.href = `/polls/${pollId}`;
+    });
+
+    s.querySelectorAll('*').forEach((child) => {
+      child.addEventListener('click', (e) => e.stopPropagation());
+    });
+  });
+</script>

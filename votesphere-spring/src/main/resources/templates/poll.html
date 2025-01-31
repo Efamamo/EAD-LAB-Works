@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head th:replace="fragments/logged_head :: head"></head>
+  <body class="bg-gray-50 min-h-screen">
+    <!-- Navigation -->
+    <nav th:replace="fragments/nav :: nav"></nav>
+
+    <!-- Main Content -->
+    <div class="container max-w-6xl mx-auto px-4 py-8">
+      <!-- Polls List -->
+      <p class="delete-error mb-4 text-red-500 text-sm"></p>
+
+      <div class="bg-white rounded-lg shadow p-6 pb-4">
+        <!-- Poll Header -->
+        <div class="flex justify-between">
+          <div class="flex items-center gap-4 mb-4">
+            <span
+              th:text="${poll.id}"
+              class="text-sm font-medium text-gray-500 bg-gray-100 px-3 py-1 rounded-full"
+            ></span>
+            <h2
+              th:text="${poll.question}"
+              class="text-xl font-semibold text-gray-800"
+            ></h2>
+          </div>
+
+          <div
+            th:if="${isAdmin}"
+            class="cursor-pointer delete-poll"
+            th:attr="data-id=${poll.id}"
+          >
+            <img src="../assets/delete.png" alt="Delete" class="w-5" />
+          </div>
+        </div>
+
+        <div class="space-y-2 pl-12" th:each="choice : ${poll.choices}">
+          <div class="flex justify-between items-center gap-4">
+            <p
+              class="text-lg font-semibold w-24 text-right"
+              th:text="${choice.count + ' %'}"
+            ></p>
+
+            <div class="w-full border border-grey-400 my-2 flex flex-col gap-2">
+              <div class="flex items-center gap-2 cursor-pointer p-2">
+                <input
+                  type="radio"
+                  th:name="${poll.id}"
+                  th:id="${choice.id}"
+                  th:value="${choice.content}"
+                  th:checked="${choice.checked == 'yes'}"
+                  class="appearance-none w-4 h-4 border-2 border-blue-500 rounded-full checked:bg-blue-500 poll-choice cursor-pointer"
+                />
+
+                <label
+                  th:text="${choice.content}"
+                  th:for="${choice.id}"
+                  class="font-medium cursor-pointer"
+                ></label>
+              </div>
+              <div
+                class="bg-blue-600 h-1"
+                th:style="'width: ' + (${choice.count} == 0 ? '0.2' : ${choice.count}) + '%;'"
+              ></div>
+            </div>
+          </div>
+        </div>
+        <div class="flex justify-end items-center mt-4 border-t pt-4 pl-4">
+          <div class="flex items-center gap-6 mr-2">
+            <div class="flex items-center gap-2">
+              <p th:text="${poll.likes}" class="font-medium text-blue-600"></p>
+              <button th:if="${poll.userLiked}" th:attr="data-id=${poll.id}">
+                <i
+                  th:attr="data-id=${poll.id}"
+                  class="fas fa-thumbs-up unlike_btn"
+                  style="color: blue"
+                ></i>
+              </button>
+              <button th:if="${!poll.userLiked}">
+                <i
+                  th:attr="data-id=${poll.id}"
+                  class="far fa-thumbs-up like_btn"
+                ></i>
+              </button>
+            </div>
+
+            <!-- Dislike Section -->
+            <div class="flex items-center gap-2 mt-2">
+              <p
+                th:text="${poll.dislikes}"
+                class="font-medium text-blue-600 mb-2"
+              ></p>
+              <button th:if="${poll.userDisliked}">
+                <i
+                  th:attr="data-id=${poll.id}"
+                  class="fas fa-thumbs-down undislike_btn"
+                  style="color: red"
+                ></i>
+              </button>
+              <button th:if="${!poll.userDisliked}">
+                <i
+                  th:attr="data-id=${poll.id}"
+                  class="far fa-thumbs-down dislike_btn"
+                ></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="bg-white rounded-lg shadow p-6 mt-6 mb-40">
+        <h2 class="text-2xl font-semibold text-gray-800 mb-6">Comments</h2>
+
+        <!-- Comments Container -->
+        <div class="space-y-6">
+          <!-- Loop through comments -->
+          <div
+            class="flex space-x-4 items-start"
+            th:each="comment : ${poll.comments}"
+          >
+            <!-- User Avatar -->
+            <div>
+              <img
+                src="../assets/user.png"
+                alt="User Avatar"
+                class="w-7 rounded-full object-cover"
+              />
+            </div>
+
+            <!-- Comment Content -->
+            <div class="flex-1">
+              <!-- User Name and Timestamp -->
+              <div class="flex justify-between items-center">
+                <p class="text-sm font-medium text-gray-900">
+                  <span th:text="${comment.owner}"></span>
+                </p>
+
+                <img
+                  src="../assets/delete.png"
+                  alt="Delete"
+                  th:name="${comment.id}"
+                  th:id="${poll.id}"
+                  class="w-4 rounded-full object-cover cursor-pointer delete-comment"
+                  th:if="${comment.isOwner}"
+                />
+              </div>
+
+              <!-- Comment Text -->
+              <p class="text-gray-700 mt-1" th:text="${comment.content}"></p>
+            </div>
+          </div>
+          <p class="comment-error text-sm text-red-600"></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="w-full pt-8 mt-6 fixed bottom-1">
+      <div
+        class="bg-white max-w-4xl mx-auto rounded-lg shadow p-6 pb-4 border border-gray-400"
+      >
+        <form class="flex gap-8 w-full pr-6 comment-form">
+          <input
+            type="text"
+            name="content"
+            placeholder="Comment"
+            class="border-b border-gray-300 p-2 focus:outline-none flex-1 bg-gray-200"
+          />
+          <input class="hidden" name="poll" th:value="${poll.id}" />
+
+          <button>
+            <img class="w-6" src="../assets/send.png" />
+          </button>
+        </form>
+      </div>
+    </div>
+  </body>
+</html>
+
+<script>
+  // Select all elements with the class 'poll-choice'
+  const choices = document.querySelectorAll('.poll-choice');
+  const commentForm = document.querySelector('.comment-form');
+  const commentError = document.querySelector('.comment-error');
+  const like_buttons = document.querySelectorAll('.like_btn');
+  const unlike_buttons = document.querySelectorAll('.unlike_btn');
+  const dislike_buttons = document.querySelectorAll('.dislike_btn');
+  const undislike_buttons = document.querySelectorAll('.undislike_btn');
+  const deletePollElement = document.querySelector('.delete-poll');
+  const deleteError = document.querySelector('.delete-error');
+
+  like_buttons.forEach((button) => {
+    button.addEventListener('click', async () => {
+      try {
+        const pollId = button.getAttribute('data-id');
+        const response = await fetch(`/polls/${pollId}/like`, {
+          method: 'PATCH',
+        });
+        const data = await response.json();
+        if (response.status == 200) {
+          window.location.reload();
+        }
+      } catch (e) {
+        console.log(e);
+      }
+    });
+  });
+
+  unlike_buttons.forEach((button) => {
+    button.addEventListener('click', async () => {
+      try {
+        const pollId = button.getAttribute('data-id');
+        const response = await fetch(`/polls/${pollId}/unlike`, {
+          method: 'PATCH',
+        });
+        const data = await response.json();
+        if (response.status == 200) {
+          window.location.reload();
+        }
+      } catch (e) {
+        console.log(e);
+      }
+    });
+  });
+
+  dislike_buttons.forEach((button) => {
+    button.addEventListener('click', async () => {
+      try {
+        const pollId = button.getAttribute('data-id');
+        const response = await fetch(`/polls/${pollId}/dislike`, {
+          method: 'PATCH',
+        });
+        const data = await response.json();
+        console.log(data);
+        if (response.status == 200) {
+          window.location.reload();
+        }
+      } catch (e) {
+        console.log(e);
+      }
+    });
+  });
+
+  undislike_buttons.forEach((button) => {
+    button.addEventListener('click', async () => {
+      try {
+        const pollId = button.getAttribute('data-id');
+        const response = await fetch(`/polls/${pollId}/undislike`, {
+          method: 'PATCH',
+        });
+        const data = await response.json();
+        if (response.status == 200) {
+          window.location.reload();
+        }
+      } catch (e) {
+        console.log(e);
+      }
+    });
+  });
+
+  // Iterate over each choice and attach a click event listener
+  choices.forEach((choice) => {
+    choice.addEventListener('click', async (e) => {
+      // Log the ID of the selected choice
+      const choice = e.target.id;
+      const poll = e.target.name;
+
+      const response = await fetch(`/polls/${poll}?choice=${choice}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          choiceId: choice,
+        }),
+      });
+
+      const data = await response.json();
+      if (response.status == 200) {
+        window.location.reload();
+      }
+      console.log(data);
+    });
+  });
+
+  commentForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const commentFormData = new FormData(commentForm);
+    const content = commentFormData.get('content');
+    const poll = commentFormData.get('poll');
+
+    if (content.trim().length == 0) {
+      commentError.textContent = 'Comment content is required';
+      return;
+    }
+
+    const response = await fetch(`/polls/${poll}/comments`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        content: content,
+      }),
+    });
+
+    if (response.status == 201) {
+      window.location.reload();
+    }
+  });
+
+  document.querySelectorAll('.delete-comment').forEach((deleteButton) => {
+    deleteButton.addEventListener('click', async (event) => {
+      if (confirm('Are you sure you want to delete this comment')) {
+        const commentId = event.target.getAttribute('name');
+        const pollId = event.target.getAttribute('id');
+
+        const response = await fetch(`/polls/${pollId}/comments/${commentId}`, {
+          method: 'DELETE',
+        });
+        const data = await response.json();
+
+        if (response.status == 200) {
+          window.location.reload();
+        } else {
+          commentError.textContent = data.error;
+        }
+      }
+    });
+  });
+
+  deletePollElement.addEventListener('click', async () => {
+    if (confirm('Are you sure you want to delete this poll?')) {
+      deleteError.textContent = '';
+      const pollId = deletePollElement.getAttribute('data-id');
+      try {
+        const response = await fetch(`/polls/${pollId}`, {
+          method: 'DELETE',
+        });
+        const data = await response.json();
+        if (response.status == 200) {
+          window.location.href = '/polls';
+        } else {
+          deleteError.textContent = data.error;
+        }
+      } catch (e) {
+        console.log(e);
+      }
+    }
+  });
+</script>

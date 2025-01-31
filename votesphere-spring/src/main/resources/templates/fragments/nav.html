@@ -1,0 +1,66 @@
+<nav class="max-md:hidden flex justify-between mx-32 my-10 items-center">
+  <a href="/polls">
+    <div class="flex items-center gap-2">
+      <img class="w-10" src="../../assets/logo.png" />
+      <h2
+        style="font-family: 'Montserrat', serif"
+        class="text-2xl text-customBlue mt-1"
+      >
+        VOTESPHERE
+      </h2>
+    </div>
+  </a>
+
+  <div class="flex items-center gap-5 mt-4 relative">
+    <!-- User Image -->
+    <img
+      class="w-7 cursor-pointer"
+      src="../../assets/user.png"
+      alt="User"
+      id="userImage"
+    />
+
+    <div
+      id="menu"
+      class="absolute bg-white shadow rounded-lg p-2 mt-2 hidden"
+      style="top: 100%; left: 0"
+    >
+      <ul class="space-y-2">
+        <a href="/profile"
+          ><li class="cursor-pointer hover:bg-gray-100 px-4 py-2">
+            Profile
+          </li></a
+        >
+
+        <a href="/groups/members"
+          ><li class="cursor-pointer hover:bg-gray-100 px-4 py-2">Groups</li></a
+        >
+        <li
+          onclick="fetch('/auth/logout', {method: 'DELETE', credentials: 'include'}).then(() => window.location.href = '/auth/login')"
+          class="cursor-pointer hover:bg-gray-100 px-4 py-2"
+        >
+          Logout
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    const userImage = document.getElementById('userImage');
+    const menu = document.getElementById('menu');
+
+    userImage.addEventListener('click', () => {
+      if (menu.classList.contains('hidden')) {
+        menu.classList.remove('hidden');
+      } else {
+        menu.classList.add('hidden');
+      }
+    });
+
+    document.addEventListener('click', (event) => {
+      if (!userImage.contains(event.target) && !menu.contains(event.target)) {
+        menu.classList.add('hidden');
+      }
+    });
+  </script>
+</nav>
